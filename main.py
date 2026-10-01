@@ -5,12 +5,12 @@ from fastapi import FastAPI, HTTPException, status
 from models import Task
 from schemas import TaskCreate, TaskResponse, TaskUpdate
 
-app = FastAPI(title="Task Management API", description="A FastAPI app using Pydantic for validation and frozen dataclasses for internal state.", version="1.0.0")
+app = FastAPI(title="Task Management API", description="A FastAPI Assignments.")
 
 tasks: dict[int, Task] = {}
 
 
-@app.post("/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED, summary="Create a new task" )
+@app.post("/tasks", response_model=TaskResponse, status_code=status.HTTP_201_CREATED )
 def create_task(task_input: TaskCreate):
     task_data = task_input.model_dump()
     task_id = len(tasks) + 1
@@ -20,12 +20,12 @@ def create_task(task_input: TaskCreate):
     return TaskResponse(**task_dict)
 
 
-@app.get("/tasks", response_model=List[TaskResponse], summary="List all tasks")
+@app.get("/tasks", response_model=List[TaskResponse])
 def get_tasks():
     return [TaskResponse(**asdict(task)) for task in tasks.values()]
 
 
-@app.delete("/tasks/{task_id}", summary="Delete a task")
+@app.delete("/tasks/{task_id}")
 def delete_task(task_id: int):
     if task_id not in tasks:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with ID {task_id} not found")
@@ -33,7 +33,7 @@ def delete_task(task_id: int):
     return {"message": f"Task {task_id} has been deleted successfully"}
 
 
-@app.patch("/tasks/{task_id}", response_model=TaskResponse, summary="Partially update an existing task")
+@app.patch("/tasks/{task_id}", response_model=TaskResponse)
 def patch_task(task_id: int, update_data: TaskUpdate):
     if task_id not in tasks:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Task with ID {task_id} not found")
